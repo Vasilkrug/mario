@@ -31,15 +31,17 @@ export class Level1_1 extends Phaser.Scene {
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         if (!platforms || !ground || !pipes) return;
-        this.physics.add.collider(this.player, platforms);
-        this.physics.add.collider(this.player, ground);
-        this.physics.add.collider(this.player, pipes);
-        ground.setCollisionByExclusion([-1]);
-        platforms.setCollisionByExclusion([-1]);
-        pipes.setCollisionByExclusion([-1]);
+        this.addPhysicToLayers(platforms, ground, pipes)
         this.cameras.main.startFollow(this.player);
         this.player.play('playerStay');
         this.player.setGravityY(400)
+    }
+
+    addPhysicToLayers(...layers: Phaser.Tilemaps.TilemapLayer[]) {
+        layers.forEach(layer => {
+            this.physics.add.collider(this.player as Player, layer);
+            layer.setCollisionByExclusion([-1]);
+        });
     }
 
     update(_: number, delta: number) {
