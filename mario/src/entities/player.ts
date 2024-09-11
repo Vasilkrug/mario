@@ -19,7 +19,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         });
         this.anims.create({
             key: 'playerRun',
-            frames: this.anims.generateFrameNames('player', {prefix: 'run', start: 3, end: 1, zeroPad: 4}),
+            frames: this.anims.generateFrameNames('player', {prefix: 'run', start: 3, end: 2, zeroPad: 4}),
             repeat: -1,
             frameRate: 9
         });
