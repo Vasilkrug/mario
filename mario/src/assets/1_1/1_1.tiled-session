@@ -1,0 +1,40 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
+        "1_1.json": {
+            "scale": 1.5,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 1103,
+                "y": 198.66666666666669
+            }
+        },
+        "1_1.json#tileset": {
+            "scaleInDock": 1.5
+        }
+    },
+    "last.imagePath": "C:/mario/mario/src/assets",
+    "map.lastUsedFormat": "json",
+    "map.width": 46,
+    "openFiles": [
+    ],
+    "project": "1_1.tiled-project",
+    "recentFiles": [
+        "1_1.json"
+    ],
+    "tileset.embedInMap": true,
+    "tileset.spacing": 0,
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    }
+}
