@@ -14,6 +14,7 @@ export class Level1_1 extends Phaser.Scene {
         this.load.atlas('player', 'src/assets/player/mario.png', 'src/assets/player/sprites.json');
         this.load.audio('jump', 'src/assets/player/sounds/jump.mp3');
         this.load.audio('mainTheme', 'src/assets/sounds/main-theme.mp3');
+        this.load.audio('coin', 'src/assets/sounds/coin.mp3');
     }
 
     create() {
@@ -38,18 +39,28 @@ export class Level1_1 extends Phaser.Scene {
         this.cameras.main.startFollow(this.player);
         this.player.play('playerStay');
         this.player.setGravityY(400);
-        const mysteryBoxes = map.getObjectLayer('mysteryBox');
-        mysteryBoxes?.objects.forEach(object => {
-            const {x = 0, y = 0} = object;
-            const block = this.add.sprite(Math.round(x), Math.round(y), 'box');
-            block.setPosition(block.x + block.width / 2, block.y + block.height / 2);
+        const mysteryBoxes = map.createFromObjects('mysteryBox', {
+            key: 'box'
+        });
+
+        mysteryBoxes?.forEach(block => {
+            this.physics.world.enable(block);
+            // @ts-ignore
+            block.body.allowGravity = false;
+            block.body.immovable = true;
+            this.physics.add.collider(this.player as Player, block, () => {
+                if (block.body.touching && this.player?.body?.touching.up) {
+                    this.sound.play('coin');
+                }
+            });
         })
         // this.sound.play('mainTheme');
     }
 
     addPhysicToLayers(...layers: Phaser.Tilemaps.TilemapLayer[]) {
         layers.forEach(layer => {
-            this.physics.add.collider(this.player as Player, layer);
+            this.physics.add.collider(this.player as Player, layer, () => {
+            });
             layer.setCollisionByExclusion([-1]);
         });
     }
