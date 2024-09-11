@@ -9,6 +9,7 @@ export class Level1_1 extends Phaser.Scene {
 
     preload() {
         this.load.image('tileset', 'src/assets/tileset.png');
+        this.load.image('box', 'src/assets/mysteryBox.png');
         this.load.tilemapTiledJSON('level1_1Map', 'src/assets/1_1/1_1.json');
         this.load.atlas('player', 'src/assets/player/mario.png', 'src/assets/player/sprites.json');
         this.load.audio('jump', 'src/assets/player/sounds/jump.mp3');
@@ -25,18 +26,24 @@ export class Level1_1 extends Phaser.Scene {
         map.createLayer('skyes', tileset, 0, 0);
         map.createLayer('bushes', tileset, 0, 0);
         const platforms = map.createLayer('platforms', tileset, 0, 0);
-        map.createLayer('blocks', tileset, 0, 0);
+        const blocks = map.createLayer('blocks', tileset, 0, 0);
         map.createLayer('castle', tileset, 0, 0);
         this.cameras.main.zoomTo(4);
 
         this.player = new Player(this, 100, 232, 'player')
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-        if (!platforms || !ground || !pipes) return;
-        this.addPhysicToLayers(platforms, ground, pipes)
+        if (!platforms || !ground || !pipes || !blocks) return;
+        this.addPhysicToLayers(platforms, ground, pipes, blocks)
         this.cameras.main.startFollow(this.player);
         this.player.play('playerStay');
         this.player.setGravityY(400);
+        const mysteryBoxes = map.getObjectLayer('mysteryBox');
+        mysteryBoxes?.objects.forEach(object => {
+            const {x = 0, y = 0} = object;
+            const block = this.add.sprite(Math.round(x), Math.round(y), 'box');
+            block.setPosition(block.x + block.width / 2, block.y + block.height / 2);
+        })
         // this.sound.play('mainTheme');
     }
 
