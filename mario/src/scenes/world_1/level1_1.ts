@@ -12,6 +12,7 @@ export class Level1_1 extends Phaser.Scene {
         this.load.tilemapTiledJSON('level1_1Map', 'src/assets/1_1/1_1.json');
         this.load.atlas('player', 'src/assets/player/mario.png', 'src/assets/player/sprites.json');
         this.load.audio('jump', 'src/assets/player/sounds/jump.mp3');
+        this.load.audio('mainTheme', 'src/assets/sounds/main-theme.mp3');
     }
 
     create() {
@@ -35,7 +36,8 @@ export class Level1_1 extends Phaser.Scene {
         this.addPhysicToLayers(platforms, ground, pipes)
         this.cameras.main.startFollow(this.player);
         this.player.play('playerStay');
-        this.player.setGravityY(400)
+        this.player.setGravityY(400);
+        // this.sound.play('mainTheme');
     }
 
     addPhysicToLayers(...layers: Phaser.Tilemaps.TilemapLayer[]) {
