@@ -1,5 +1,8 @@
+import {Player} from "../../entities/player.ts";
+
 export class Level1_1 extends Phaser.Scene {
     player?: Phaser.Physics.Arcade.Sprite;
+
     constructor() {
         super('Level1_1');
     }
@@ -12,29 +15,19 @@ export class Level1_1 extends Phaser.Scene {
 
     create() {
         const map = this.make.tilemap({key: 'level1_1Map'});
-        const tileset = map.addTilesetImage('tileset', 'tileset', 16,16);
+        const tileset = map.addTilesetImage('tileset', 'tileset', 16, 16);
         if (!tileset) return;
-        map.createLayer('background', tileset,0,0);
-        const ground = map.createLayer('ground', tileset,0,0);
-        const pipes = map.createLayer('pipes', tileset,0,0);
-        map.createLayer('skyes', tileset,0,0);
-        map.createLayer('bushes', tileset,0,0);
-        const platforms = map.createLayer('platforms', tileset,0,0);
-        map.createLayer('blocks', tileset,0,0);
-        map.createLayer('castle', tileset,0,0);
+        map.createLayer('background', tileset, 0, 0);
+        const ground = map.createLayer('ground', tileset, 0, 0);
+        const pipes = map.createLayer('pipes', tileset, 0, 0);
+        map.createLayer('skyes', tileset, 0, 0);
+        map.createLayer('bushes', tileset, 0, 0);
+        const platforms = map.createLayer('platforms', tileset, 0, 0);
+        map.createLayer('blocks', tileset, 0, 0);
+        map.createLayer('castle', tileset, 0, 0);
         this.cameras.main.zoomTo(4);
-        this.anims.create({
-            key: 'playerStay',
-            frames: this.anims.generateFrameNames('player', { prefix: 'stay', start: 1,end: 1, zeroPad: 4}),
-            repeat: -1
-        });
-        this.anims.create({
-            key: 'playerRun',
-            frames: this.anims.generateFrameNames('player', { prefix: 'run', start: 1,end: 5, zeroPad: 4}),
-            repeat: -1,
-            frameRate: 9
-        });
-        this.player = this.physics.add.sprite(100,232,'player').setCollideWorldBounds(true);
+
+        this.player = new Player(this, 100, 232, 'player')
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         if (!platforms || !ground || !pipes) return;
@@ -50,24 +43,7 @@ export class Level1_1 extends Phaser.Scene {
     }
 
     update(_: number, delta: number) {
-        const keys = this.input.keyboard?.createCursorKeys();
-        if (keys?.left.isDown) {
-            this.player?.setFlipX(false);
-            this.player?.setVelocityX(-200);
-            this.player?.play('playerRun');
-        } else if (keys?.right.isDown) {
-            this.player?.setFlipX(true);
-            this.player?.play('playerRun');
-            this.player?.setVelocityX(200);
-        } else {
-            this.player?.setVelocityX(0);
-            this.player?.play('playerStay');
-        }
-
-        if (keys?.space.isDown && this.player?.body?.blocked.down) {
-            this.player?.setVelocityY(-300);
-            this.player.play('playerStay');
-        }
+        this.player?.update(delta);
     }
 
 }
