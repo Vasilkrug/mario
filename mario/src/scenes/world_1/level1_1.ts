@@ -11,6 +11,7 @@ export class Level1_1 extends Phaser.Scene {
         this.load.image('tileset', 'src/assets/tileset.png');
         this.load.tilemapTiledJSON('level1_1Map', 'src/assets/1_1/1_1.json');
         this.load.atlas('player', 'src/assets/player/mario.png', 'src/assets/player/sprites.json');
+        this.load.audio('jump', 'src/assets/player/sounds/jump.mp3');
     }
 
     create() {

@@ -5,7 +5,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this)
         scene.physics.add.existing(this);
         this.setCollideWorldBounds(true);
-        this.speed = 17;
+        this.speed = 10;
 
         this.create();
     }
@@ -40,8 +40,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         if (keys?.space.isDown && this.body?.blocked.down) {
-            this.setVelocityY(-delta * this.speed);
+            this.setVelocityY(-delta * this.speed * 2.025);
             this.play('playerStay');
+            this.scene.sound.play('jump');
         }
     }
 }
