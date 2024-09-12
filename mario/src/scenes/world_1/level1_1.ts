@@ -4,17 +4,19 @@ export class Level1_1 extends Phaser.Scene {
     player?: Phaser.Physics.Arcade.Sprite;
 
     constructor() {
-        super('Level1_1');
+        super('Mario');
     }
 
     preload() {
         this.load.image('tileset', 'src/assets/tileset.png');
         this.load.image('box', 'src/assets/mysteryBox.png');
+        this.load.image('emptyBlock', 'src/assets/emptyBlock.png');
         this.load.tilemapTiledJSON('level1_1Map', 'src/assets/1_1/1_1.json');
         this.load.atlas('player', 'src/assets/player/mario.png', 'src/assets/player/sprites.json');
         this.load.audio('jump', 'src/assets/player/sounds/jump.mp3');
         this.load.audio('mainTheme', 'src/assets/sounds/main-theme.mp3');
         this.load.audio('coin', 'src/assets/sounds/coin.mp3');
+        this.load.audio('emptyBlock', 'src/assets/sounds/emptyBlock.mp3');
     }
 
     create() {
@@ -45,12 +47,16 @@ export class Level1_1 extends Phaser.Scene {
 
         mysteryBoxes?.forEach(block => {
             this.physics.world.enable(block);
-            // @ts-ignore
+            if (!block || !block?.body) return;
             block.body.allowGravity = false;
             block.body.immovable = true;
             this.physics.add.collider(this.player as Player, block, () => {
-                if (block.body.touching && this.player?.body?.touching.up) {
+                if (block.body.touching && this.player?.body?.touching.up && block.active) {
                     this.sound.play('coin');
+                    block.setActive(false)
+                    block.setTexture('emptyBlock');
+                } else if(block.body.touching && this.player?.body?.touching.up && !block.active) {
+                    this.sound.play('emptyBlock');
                 }
             });
         })
