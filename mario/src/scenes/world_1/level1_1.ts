@@ -1,5 +1,11 @@
 import {Player} from "../../entities/player.ts";
 
+type tweensObjectAnimsType = Phaser.GameObjects.GameObject | Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+type tweensConfigType = Phaser.Types.Tweens.TweenBuilderConfig
+    | Phaser.Types.Tweens.TweenChainBuilderConfig
+    | Phaser.Tweens.Tween
+    | Phaser.Tweens.TweenChain;
+
 export class Level1_1 extends Phaser.Scene {
     player?: Phaser.Physics.Arcade.Sprite;
 
@@ -13,6 +19,7 @@ export class Level1_1 extends Phaser.Scene {
         this.load.image('emptyBlock', 'src/assets/emptyBlock.png');
         this.load.tilemapTiledJSON('level1_1Map', 'src/assets/1_1/1_1.json');
         this.load.atlas('player', 'src/assets/player/mario.png', 'src/assets/player/sprites.json');
+        this.load.atlas('coin', 'src/assets/coin/coin.png', 'src/assets/coin/coin.json');
         this.load.audio('jump', 'src/assets/player/sounds/jump.mp3');
         this.load.audio('mainTheme', 'src/assets/sounds/main-theme.mp3');
         this.load.audio('coin', 'src/assets/sounds/coin.mp3');
@@ -50,36 +57,77 @@ export class Level1_1 extends Phaser.Scene {
             if (!block || !block?.body) return;
             block.body.allowGravity = false;
             block.body.immovable = true;
+            const blockTweensConfig = {
+                targets: block,
+                duration: 70,
+                y: block.y - block.height / 2,
+                onComplete: () => {
+                    this.tweens.add({
+                        targets: block,
+                        duration: 70,
+                        start: performance.now(),
+                        y: block.y + block.height / 2
+                    });
+                },
+                onCompleteScope: this
+            };
+
             this.physics.add.collider(this.player as Player, block, () => {
                 if (block.body.touching && this.player?.body?.touching.up && block.active) {
-                    this.sound.play('coin');
+                    this.emergenceObjectFromBlock(block);
                     block.setActive(false)
                     block.setTexture('emptyBlock');
-                    this.moveBlockAnimation(block);
-                } else if(block.body.touching && this.player?.body?.touching.up && !block.active) {
+                    this.tweensMoveAnimation(blockTweensConfig);
+                } else if (block.body.touching && this.player?.body?.touching.up && !block.active) {
                     this.sound.play('emptyBlock');
-                    this.moveBlockAnimation(block);
+                    this.tweensMoveAnimation(blockTweensConfig);
                 }
             });
         })
         // this.sound.play('mainTheme');
     }
 
-    private moveBlockAnimation(block: Phaser.GameObjects.GameObject) {
-        this.tweens.add({
-            targets: block,
-            duration: 70,
-            y: block.y - block.height / 2,
-            onComplete: () => {
-                this.tweens.add({
-                    targets: block,
-                    duration: 70,
+    private emergenceObjectFromBlock(block: tweensObjectAnimsType) {
+        const name = block.name;
+
+        switch (name) {
+            case 'coin':
+                const coin = this.physics.add.sprite(
+                    block.getBounds().x + block.width / 2,
+                    block.getBounds().y - block.height / 2,
+                    'coin');
+                coin.immovable = true;
+                coin.allowGravity = false;
+                coin.smoothed = true;
+                coin.depth = 0;
+                this.sound.play('coin');
+                this.tweensMoveAnimation({
+                    targets: coin,
+                    duration: 500,
                     start: performance.now(),
-                    y: block.y + block.height / 2
+                    y: coin.y - coin.height,
+                    onComplete: () => {
+                        this.tweens.add({
+                            targets: coin,
+                            duration: 500,
+                            start: performance.now(),
+                            y: coin.y + coin.height,
+                            onComplete: () => {
+                                coin.destroy();
+                            }
+                        });
+                    },
+                    onCompleteScope: this
                 });
-            }
-        })
+                break;
+        }
     }
+
+    private tweensMoveAnimation(config: tweensConfigType) {
+        this.tweens.add(config);
+    }
+
+    private
 
     addPhysicToLayers(...layers: Phaser.Tilemaps.TilemapLayer[]) {
         layers.forEach(layer => {
