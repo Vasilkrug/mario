@@ -8,9 +8,12 @@ type tweensConfigType = Phaser.Types.Tweens.TweenBuilderConfig
 
 export class Level1_1 extends Phaser.Scene {
     player?: Phaser.Physics.Arcade.Sprite;
+    score: number;
+    scoreText?: Phaser.GameObjects.Text;
 
     constructor() {
         super('Mario');
+        this.score = 0;
     }
 
     preload() {
@@ -39,7 +42,8 @@ export class Level1_1 extends Phaser.Scene {
         const blocks = map.createLayer('blocks', tileset, 0, 0);
         map.createLayer('castle', tileset, 0, 0);
         this.cameras.main.zoomTo(4);
-
+        this.scoreText = this.add.text(100, window.screenY, '', { fontFamily: 'Pixelify Sans', align: 'left'})
+        console.log(this.scoreText)
         this.player = new Player(this, 100, 232, 'player')
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -83,8 +87,14 @@ export class Level1_1 extends Phaser.Scene {
                     this.tweensMoveAnimation(blockTweensConfig);
                 }
             });
-        })
+        });
+        this.updateScoreText();
         // this.sound.play('mainTheme');
+    }
+
+    private updateScoreText() {
+        if (!this.scoreText) return;
+        this.scoreText.setText('MARIO\n' + this.score.toString().padStart(6, '0'));
     }
 
     private emergenceObjectFromBlock(block: tweensObjectAnimsType) {
@@ -103,13 +113,13 @@ export class Level1_1 extends Phaser.Scene {
                 this.sound.play('coin');
                 this.tweensMoveAnimation({
                     targets: coin,
-                    duration: 500,
+                    duration: 250,
                     start: performance.now(),
                     y: coin.y - coin.height,
                     onComplete: () => {
                         this.tweens.add({
                             targets: coin,
-                            duration: 500,
+                            duration: 250,
                             start: performance.now(),
                             y: coin.y + coin.height,
                             onComplete: () => {
@@ -119,6 +129,8 @@ export class Level1_1 extends Phaser.Scene {
                     },
                     onCompleteScope: this
                 });
+                this.score += 100;
+                this.updateScoreText();
                 break;
         }
     }
@@ -127,7 +139,6 @@ export class Level1_1 extends Phaser.Scene {
         this.tweens.add(config);
     }
 
-    private
 
     addPhysicToLayers(...layers: Phaser.Tilemaps.TilemapLayer[]) {
         layers.forEach(layer => {
@@ -139,6 +150,7 @@ export class Level1_1 extends Phaser.Scene {
 
     update(_: number, delta: number) {
         this.player?.update(delta);
-    }
+        console.log()
+     }
 
 }
