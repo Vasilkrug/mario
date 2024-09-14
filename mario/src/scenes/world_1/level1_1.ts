@@ -55,12 +55,30 @@ export class Level1_1 extends Phaser.Scene {
                     this.sound.play('coin');
                     block.setActive(false)
                     block.setTexture('emptyBlock');
+                    this.moveBlockAnimation(block);
                 } else if(block.body.touching && this.player?.body?.touching.up && !block.active) {
                     this.sound.play('emptyBlock');
+                    this.moveBlockAnimation(block);
                 }
             });
         })
         // this.sound.play('mainTheme');
+    }
+
+    private moveBlockAnimation(block: Phaser.GameObjects.GameObject) {
+        this.tweens.add({
+            targets: block,
+            duration: 70,
+            y: block.y - block.height / 2,
+            onComplete: () => {
+                this.tweens.add({
+                    targets: block,
+                    duration: 70,
+                    start: performance.now(),
+                    y: block.y + block.height / 2
+                });
+            }
+        })
     }
 
     addPhysicToLayers(...layers: Phaser.Tilemaps.TilemapLayer[]) {
