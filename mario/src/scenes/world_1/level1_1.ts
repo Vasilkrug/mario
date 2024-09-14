@@ -18,11 +18,11 @@ export class Level1_1 extends Phaser.Scene {
 
     preload() {
         this.load.image('tileset', 'src/assets/tileset.png');
-        this.load.image('box', 'src/assets/mysteryBox.png');
         this.load.image('emptyBlock', 'src/assets/emptyBlock.png');
         this.load.tilemapTiledJSON('level1_1Map', 'src/assets/1_1/1_1.json');
         this.load.atlas('player', 'src/assets/player/mario.png', 'src/assets/player/sprites.json');
         this.load.atlas('coin', 'src/assets/coin/coin.png', 'src/assets/coin/coin.json');
+        this.load.atlas('box', 'src/assets/blocks/mysteryBlock.png', 'src/assets/blocks/mysteryBlock.json');
         this.load.audio('jump', 'src/assets/player/sounds/jump.mp3');
         this.load.audio('mainTheme', 'src/assets/sounds/main-theme.mp3');
         this.load.audio('coin', 'src/assets/sounds/coin.mp3');
@@ -30,6 +30,7 @@ export class Level1_1 extends Phaser.Scene {
     }
 
     create() {
+        this.createAnimations();
         const map = this.make.tilemap({key: 'level1_1Map'});
         const tileset = map.addTilesetImage('tileset', 'tileset', 16, 16);
         if (!tileset) return;
@@ -41,9 +42,10 @@ export class Level1_1 extends Phaser.Scene {
         const platforms = map.createLayer('platforms', tileset, 0, 0);
         const blocks = map.createLayer('blocks', tileset, 0, 0);
         map.createLayer('castle', tileset, 0, 0);
+
         this.cameras.main.zoomTo(4);
-        this.scoreText = this.add.text(100, window.screenY, '', { fontFamily: 'Pixelify Sans', align: 'left'})
-        console.log(this.scoreText)
+        this.scoreText = this.add.text(100, window.screenY, '', {fontFamily: 'Pixelify Sans', align: 'left'})
+
         this.player = new Player(this, 100, 232, 'player')
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -55,7 +57,7 @@ export class Level1_1 extends Phaser.Scene {
         const mysteryBoxes = map.createFromObjects('mysteryBox', {
             key: 'box'
         });
-
+        this.anims.play('mysteryBlock', mysteryBoxes);
         mysteryBoxes?.forEach(block => {
             this.physics.world.enable(block);
             if (!block || !block?.body) return;
@@ -90,6 +92,15 @@ export class Level1_1 extends Phaser.Scene {
         });
         this.updateScoreText();
         // this.sound.play('mainTheme');
+    }
+
+    private createAnimations() {
+        this.anims.create({
+            key: 'mysteryBlock',
+            frames: this.anims.generateFrameNames('box', {prefix: 'mystery', start: 1, end: 3, zeroPad: 4}),
+            repeat: -1,
+            duration: 1000
+        })
     }
 
     private updateScoreText() {
@@ -150,7 +161,6 @@ export class Level1_1 extends Phaser.Scene {
 
     update(_: number, delta: number) {
         this.player?.update(delta);
-        console.log()
-     }
+    }
 
 }
